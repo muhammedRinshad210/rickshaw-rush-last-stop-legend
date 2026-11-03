@@ -273,21 +273,46 @@ export class EnvironmentScenery {
     const roadLeft = this.scene.roadLeftX;
     const roadRight = this.scene.roadRightX;
     const screenWidth = this.scene.scale.width;
-    const biome = CONFIG.ENVIRONMENTS[this.currentBiomeIndex];
-
-    if (side === 'left') {
-      const minX = Math.max(30, roadLeft - 180);
-      const maxX = roadLeft - 36;
-      item.x = Phaser.Math.Between(minX, maxX);
-    } else {
-      const minX = roadRight + 36;
-      const maxX = Math.min(screenWidth - 30, roadRight + 190);
-      item.x = Phaser.Math.Between(minX, maxX);
-    }
+    const kerbW = CONFIG.ROAD.KERB_WIDTH;
 
     // Special placement for bridge railings (snap precisely to road curb edge)
     if (item.texture && item.texture.key === 'scenery_bridge_railing') {
-      item.x = side === 'left' ? roadLeft - 18 : roadRight + 18;
+      item.setScale(1.0);
+      item.x = side === 'left' ? Math.round(roadLeft - kerbW / 2) : Math.round(roadRight + kerbW / 2);
+      return;
+    }
+
+    if (side === 'left') {
+      const shoulderWidth = Math.max(24, roadLeft - kerbW);
+      // Object-specific responsive scaling: ensures displayWidth fits comfortably within shoulder
+      const maxAllowedWidth = Math.max(16, shoulderWidth - 10);
+      const scale = Math.min(1.0, maxAllowedWidth / (item.width || 80));
+      item.setScale(scale);
+
+      const halfW = (item.width * scale) / 2;
+      const minX = Math.round(4 + halfW);
+      const maxX = Math.round(roadLeft - kerbW - 4 - halfW);
+
+      if (minX <= maxX) {
+        item.x = Phaser.Math.Between(minX, maxX);
+      } else {
+        item.x = Math.round((roadLeft - kerbW) / 2);
+      }
+    } else {
+      const shoulderWidth = Math.max(24, screenWidth - (roadRight + kerbW));
+      const maxAllowedWidth = Math.max(16, shoulderWidth - 10);
+      const scale = Math.min(1.0, maxAllowedWidth / (item.width || 80));
+      item.setScale(scale);
+
+      const halfW = (item.width * scale) / 2;
+      const minX = Math.round(roadRight + kerbW + 4 + halfW);
+      const maxX = Math.round(screenWidth - 4 - halfW);
+
+      if (minX <= maxX) {
+        item.x = Phaser.Math.Between(minX, maxX);
+      } else {
+        item.x = Math.round(roadRight + kerbW + shoulderWidth / 2);
+      }
     }
   }
 
@@ -446,78 +471,167 @@ export class EnvironmentScenery {
     const roadRight = this.scene.roadRightX;
     const roadWidth = this.scene.roadWidth;
     const biome = CONFIG.ENVIRONMENTS[this.currentBiomeIndex];
+    const kerbW = CONFIG.ROAD.KERB_WIDTH;
 
-    // 1. Shoulders / Background landscape
+    // 1. Base Shoulders / Background landscape fill
     g.fillStyle(this.activeColors.shoulder, 1);
-    g.fillRect(0, 0, w, h);
+    g.fillRect(0, 0, Math.floor(w), Math.floor(h));
 
-    // Coastal Theme: Arabian Sea with animated breaking waves on right
-    if (biome.id === 'coastal') {
-      const seaStartX = roadRight + 90;
-      g.fillStyle(0x01579B, 1);
-      g.fillRect(seaStartX, 0, w - seaStartX, h);
+    const leftShoulderW = Math.max(0, roadLeft - kerbW);
+    const rightShoulderStart = roadRight + kerbW;
+    const rightShoulderW = Math.max(0, w - rightShoulderStart);
 
-      // Animated Shoreline Foam & Wave Crests
-      g.fillStyle(0xE0F7FA, 0.8);
-      const waveOffset = Math.sin(this.oceanWavePhase) * 12;
-      g.fillRect(seaStartX - 8 + waveOffset, 0, 10, h);
-
-      // Wave ripples across water
-      g.lineStyle(2, 0x4FC3F7, 0.5);
-      for (let y = 0; y < h; y += 48) {
-        const ry = (y + (this.roadScrollY * 0.4)) % h;
-        g.lineBetween(seaStartX + 20, ry, w - 20, ry);
+    // Environment-Specific Background Scenery Layers:
+    if (biome.id === 'village') {
+      // Village: Layered emerald/lime paddy field stripes and roadside irrigation canal
+      if (leftShoulderW > 0) {
+        const stripeH = 48;
+        for (let y = -stripeH + Math.floor(this.roadScrollY % stripeH); y < h + stripeH; y += stripeH) {
+          const isLime = (Math.floor((y - this.roadScrollY) / stripeH) % 2 === 0);
+          g.fillStyle(isLime ? 0x388E3C : 0x2E7D32, 0.45);
+          g.fillRect(0, Math.floor(y), Math.floor(leftShoulderW * 0.72), stripeH);
+        }
+        // Narrow irrigation canal stream running along the road shoulder
+        if (leftShoulderW > 22) {
+          const canalW = Math.min(10, Math.floor(leftShoulderW * 0.24));
+          const canalX = Math.floor(roadLeft - kerbW - canalW - 2);
+          g.fillStyle(0x0288D1, 0.85); // Flowing blue stream
+          g.fillRect(canalX, 0, canalW, Math.floor(h));
+          // Canal water shimmer ripples
+          g.lineStyle(1.5, 0x81D4FA, 0.5);
+          for (let y = 0; y < h; y += 40) {
+            const ry = Math.floor((y + this.roadScrollY * 0.5) % h);
+            g.lineBetween(canalX + 1, ry, canalX + canalW - 1, ry);
+          }
+        }
       }
-    }
 
-    // Backwaters Theme: Wide shimmering lagoon waterways with water hyacinths
-    if (biome.id === 'backwaters') {
-      // Left and right shoulders are canals/lakes
+      if (rightShoulderW > 0) {
+        const stripeH = 48;
+        for (let y = -stripeH + Math.floor(this.roadScrollY % stripeH); y < h + stripeH; y += stripeH) {
+          const isLime = (Math.floor((y - this.roadScrollY) / stripeH) % 2 === 0);
+          g.fillStyle(isLime ? 0x43A047 : 0x2E7D32, 0.45);
+          g.fillRect(Math.floor(rightShoulderStart + rightShoulderW * 0.28), Math.floor(y), Math.floor(rightShoulderW * 0.72), stripeH);
+        }
+        // Wooden fences along roadside edge
+        if (rightShoulderW > 18) {
+          const fenceX = Math.floor(rightShoulderStart + 4);
+          g.lineStyle(2, 0x6D4C41, 0.75); // Fence horizontal rail
+          g.lineBetween(fenceX, 0, fenceX, Math.floor(h));
+          // Fence posts
+          g.lineStyle(2.5, 0x4E342E, 0.9);
+          for (let y = -30 + Math.floor(this.roadScrollY % 30); y < h + 30; y += 30) {
+            const py = Math.floor(y);
+            g.lineBetween(fenceX - 3, py, fenceX + 3, py);
+          }
+        }
+      }
+    } else if (biome.id === 'backwaters') {
+      // Backwaters Theme: Wide shimmering lagoon waterways with reflections
       g.fillStyle(0x0288D1, 1);
-      g.fillRect(0, 0, roadLeft - 10, h);
-      g.fillRect(roadRight + 10, 0, w - (roadRight + 10), h);
+      if (leftShoulderW > 0) g.fillRect(0, 0, Math.floor(leftShoulderW), Math.floor(h));
+      if (rightShoulderW > 0) g.fillRect(Math.floor(rightShoulderStart), 0, Math.floor(rightShoulderW), Math.floor(h));
 
-      // Water shimmer highlights
-      g.lineStyle(1.8, 0x81D4FA, 0.4);
-      for (let y = 0; y < h; y += 38) {
-        const ry = (y + this.roadScrollY * 0.3) % h;
-        g.lineBetween(10, ry, roadLeft - 30, ry);
-        g.lineBetween(roadRight + 30, ry, w - 10, ry);
+      // Water ripples and light reflections
+      g.lineStyle(1.8, 0x81D4FA, 0.5);
+      for (let y = 0; y < h; y += 36) {
+        const ry = Math.floor((y + this.roadScrollY * 0.35) % h);
+        if (leftShoulderW > 14) g.lineBetween(6, ry, Math.floor(leftShoulderW - 6), ry);
+        if (rightShoulderW > 14) g.lineBetween(Math.floor(rightShoulderStart + 6), ry, Math.floor(w - 6), ry);
       }
-    }
+    } else if (biome.id === 'coastal') {
+      // Coastal Theme:
+      // Left shoulder: Golden beach sand
+      if (leftShoulderW > 0) {
+        g.fillStyle(0xFFE082, 0.92);
+        g.fillRect(0, 0, Math.floor(leftShoulderW), Math.floor(h));
+      }
 
-    // Munnar Hills Theme: Tea terrace contours
-    if (biome.id === 'hills') {
-      g.lineStyle(2.5, 0x2E7D32, 0.6);
-      for (let y = 0; y < h; y += 32) {
-        const ry = (y + this.roadScrollY * 0.6) % h;
-        g.lineBetween(0, ry, roadLeft - 10, ry);
-        g.lineBetween(roadRight + 10, ry, w, ry);
+      // Right shoulder: Arabian Sea starts IMMEDIATELY adjacent to road kerb + narrow sandy margin
+      if (rightShoulderW > 0) {
+        const sandMargin = Math.min(8, Math.floor(rightShoulderW * 0.18));
+        g.fillStyle(0xFFE082, 0.92);
+        g.fillRect(Math.floor(rightShoulderStart), 0, sandMargin, Math.floor(h));
+
+        const seaStartX = rightShoulderStart + sandMargin;
+        const seaW = Math.max(0, w - seaStartX);
+        if (seaW > 0) {
+          g.fillStyle(0x01579B, 1);
+          g.fillRect(Math.floor(seaStartX), 0, Math.floor(seaW), Math.floor(h));
+
+          // Animated Shoreline Foam & Wave Crest
+          const waveOffset = Math.sin(this.oceanWavePhase) * 6;
+          g.fillStyle(0xE0F7FA, 0.85);
+          g.fillRect(Math.floor(seaStartX + waveOffset), 0, Math.min(8, seaW), Math.floor(h));
+
+          // Wave crest ripple lines
+          g.lineStyle(2, 0x4FC3F7, 0.6);
+          for (let y = 0; y < h; y += 44) {
+            const ry = Math.floor((y + (this.roadScrollY * 0.4)) % h);
+            g.lineBetween(Math.floor(seaStartX + 8), ry, Math.floor(w - 4), ry);
+          }
+        }
+      }
+    } else if (biome.id === 'hills') {
+      // Munnar Hills Theme: Tea terrace contours and lush green steps
+      g.lineStyle(2.5, 0x1B5E20, 0.7);
+      for (let y = 0; y < h; y += 30) {
+        const ry = Math.floor((y + this.roadScrollY * 0.6) % h);
+        if (leftShoulderW > 8) g.lineBetween(0, ry, Math.floor(leftShoulderW), ry);
+        if (rightShoulderW > 8) g.lineBetween(Math.floor(rightShoulderStart), ry, Math.floor(w), ry);
+      }
+      g.fillStyle(0x388E3C, 0.35);
+      for (let y = -20 + Math.floor(this.roadScrollY % 60); y < h + 20; y += 60) {
+        if (leftShoulderW > 12) g.fillRect(0, Math.floor(y), Math.floor(leftShoulderW * 0.6), 24);
+        if (rightShoulderW > 12) g.fillRect(Math.floor(rightShoulderStart + rightShoulderW * 0.4), Math.floor(y), Math.floor(rightShoulderW * 0.6), 24);
+      }
+    } else if (biome.id === 'town_night') {
+      // Kochi Town Night: Pavement sidewalks with curb stones and neon glow pools
+      g.fillStyle(0x263238, 1);
+      if (leftShoulderW > 0) g.fillRect(0, 0, Math.floor(leftShoulderW), Math.floor(h));
+      if (rightShoulderW > 0) g.fillRect(Math.floor(rightShoulderStart), 0, Math.floor(rightShoulderW), Math.floor(h));
+
+      // Sidewalk slab divider lines
+      g.lineStyle(1.5, 0x37474F, 0.8);
+      for (let y = -40 + Math.floor(this.roadScrollY % 40); y < h + 40; y += 40) {
+        const ry = Math.floor(y);
+        if (leftShoulderW > 0) g.lineBetween(0, ry, Math.floor(leftShoulderW), ry);
+        if (rightShoulderW > 0) g.lineBetween(Math.floor(rightShoulderStart), ry, Math.floor(w), ry);
+      }
+
+      // Ambient storefront neon glow pools on sidewalk
+      for (let y = -120 + Math.floor(this.roadScrollY % 240); y < h + 120; y += 240) {
+        if (leftShoulderW > 10) {
+          g.fillStyle(0xE91E63, 0.18); // Magenta neon pool
+          g.fillCircle(Math.floor(leftShoulderW / 2), Math.floor(y), Math.min(45, leftShoulderW));
+        }
+        if (rightShoulderW > 10) {
+          g.fillStyle(0x00E5FF, 0.16); // Cyan neon pool
+          g.fillCircle(Math.floor(rightShoulderStart + rightShoulderW / 2), Math.floor(y + 120), Math.min(45, rightShoulderW));
+        }
       }
     }
 
     // 2. Asphalt Road Bed
     g.fillStyle(this.activeColors.asphalt, 1);
-    g.fillRect(roadLeft, 0, roadWidth, h);
+    g.fillRect(Math.floor(roadLeft), 0, Math.floor(roadWidth), Math.floor(h));
 
     // 3. Rumble Kerbs (Alternating red/white, yellow/black, or concrete)
     const kerbSize = 32;
-    const kerbW = CONFIG.ROAD.KERB_WIDTH;
-
-    for (let y = -kerbSize + (this.roadScrollY % kerbSize); y < h + kerbSize; y += kerbSize) {
+    for (let y = -kerbSize + Math.floor(this.roadScrollY % kerbSize); y < h + kerbSize; y += kerbSize) {
       const isA = (Math.floor((y - this.roadScrollY) / kerbSize) % 2 === 0);
       g.fillStyle(isA ? this.activeColors.curbA : this.activeColors.curbB, 1);
 
       // Left kerb
-      g.fillRect(roadLeft - kerbW, y, kerbW, kerbSize);
+      g.fillRect(Math.floor(roadLeft - kerbW), Math.floor(y), Math.floor(kerbW), kerbSize);
       // Right kerb
-      g.fillRect(roadRight, y, kerbW, kerbSize);
+      g.fillRect(Math.floor(roadRight), Math.floor(y), Math.floor(kerbW), kerbSize);
     }
 
     // 4. White Solid Road Outer Edges
     g.fillStyle(0xFFFFFF, 0.9);
-    g.fillRect(roadLeft, 0, 5, h);
-    g.fillRect(roadRight - 5, 0, 5, h);
+    g.fillRect(Math.floor(roadLeft), 0, 5, Math.floor(h));
+    g.fillRect(Math.floor(roadRight - 5), 0, 5, Math.floor(h));
 
     // 5. Dashed Lane Dividers (Animated downward scrolling)
     const laneWidth = this.scene.laneWidth;
@@ -528,9 +642,9 @@ export class EnvironmentScenery {
     g.fillStyle(0xFFEB3B, 0.85); // Highway yellow dashed markers
 
     for (let l = 1; l < CONFIG.ROAD.LANES_COUNT; l++) {
-      const laneX = roadLeft + l * laneWidth;
-      for (let y = -dashCycle + (this.roadScrollY % dashCycle); y < h + dashCycle; y += dashCycle) {
-        g.fillRect(laneX - 3, y, 6, dashLength);
+      const laneX = Math.floor(roadLeft + l * laneWidth);
+      for (let y = -dashCycle + Math.floor(this.roadScrollY % dashCycle); y < h + dashCycle; y += dashCycle) {
+        g.fillRect(Math.floor(laneX - 3), Math.floor(y), 6, dashLength);
       }
     }
   }
@@ -548,22 +662,21 @@ export class EnvironmentScenery {
     // 1. Ambient lighting tint per biome (e.g. golden sunset, misty hills, deep night)
     if (this.activeColors.lightAlpha > 0) {
       g.fillStyle(this.activeColors.lightTint, this.activeColors.lightAlpha);
-      g.fillRect(0, 0, w, h);
+      g.fillRect(0, 0, Math.floor(w), Math.floor(h));
     }
 
-    // 2. Kerala Town at Night: Streetlight illumination glow pools
+    // 2. Kerala Town at Night: Streetlight illumination glow cones
     const biome = CONFIG.ENVIRONMENTS[this.currentBiomeIndex];
     if (biome.id === 'town_night') {
-      // Warm golden glow cones along road edges
       const roadLeft = this.scene.roadLeftX;
       const roadRight = this.scene.roadRightX;
 
-      for (let y = -100 + (this.roadScrollY % 240); y < h + 100; y += 240) {
+      for (let y = -100 + Math.floor(this.roadScrollY % 240); y < h + 100; y += 240) {
         // Left streetlight pool
         g.fillStyle(0xFFD54F, 0.12);
-        g.fillCircle(roadLeft - 20, y, 90);
+        g.fillCircle(Math.floor(roadLeft - 20), Math.floor(y), 90);
         // Right streetlight pool
-        g.fillCircle(roadRight + 20, y + 120, 90);
+        g.fillCircle(Math.floor(roadRight + 20), Math.floor(y + 120), 90);
       }
     }
   }

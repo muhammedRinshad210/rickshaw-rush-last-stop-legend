@@ -113,15 +113,28 @@ export class WeatherSystem {
 
   updatePuddlePositions() {
     const w = this.scene.scale.width;
-    const roadWidth = this.environment.scene.roadWidth || Math.min(CONFIG.ROAD.WIDTH, w * 0.88);
-    const roadLeft = (w - roadWidth) / 2;
-    const roadRight = roadLeft + roadWidth;
+    const roadLeft = (this.scene.roadLeftX !== undefined) ? this.scene.roadLeftX : (w - Math.min(CONFIG.ROAD.WIDTH, w * 0.74)) / 2;
+    const roadRight = (this.scene.roadRightX !== undefined) ? this.scene.roadRightX : (w + Math.min(CONFIG.ROAD.WIDTH, w * 0.74)) / 2;
+    const kerbW = CONFIG.ROAD.KERB_WIDTH;
 
     this.puddles.forEach(puddle => {
+      const baseWidth = puddle.width || 80;
       if (puddle.side === 'left') {
-        puddle.x = roadLeft - Phaser.Math.Between(20, 50);
+        const shoulderW = Math.max(20, roadLeft - kerbW);
+        const scale = Math.min(1.0, Math.max(0.4, (shoulderW - 8) / baseWidth));
+        puddle.setScale(scale);
+        const halfW = (baseWidth * scale) / 2;
+        const minX = 4 + halfW;
+        const maxX = roadLeft - kerbW - 4 - halfW;
+        puddle.x = Math.round(minX <= maxX ? Phaser.Math.Between(minX, maxX) : (roadLeft - kerbW) / 2);
       } else {
-        puddle.x = roadRight + Phaser.Math.Between(20, 50);
+        const shoulderW = Math.max(20, w - (roadRight + kerbW));
+        const scale = Math.min(1.0, Math.max(0.4, (shoulderW - 8) / baseWidth));
+        puddle.setScale(scale);
+        const halfW = (baseWidth * scale) / 2;
+        const minX = roadRight + kerbW + 4 + halfW;
+        const maxX = w - 4 - halfW;
+        puddle.x = Math.round(minX <= maxX ? Phaser.Math.Between(minX, maxX) : (roadRight + kerbW + shoulderW / 2));
       }
     });
   }

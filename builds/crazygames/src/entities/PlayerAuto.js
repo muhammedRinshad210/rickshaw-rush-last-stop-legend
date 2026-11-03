@@ -90,7 +90,24 @@ export class PlayerAuto extends Phaser.GameObjects.Container {
   }
 
   /* -------------------------------------------------------------
-   * LANE SWITCHING (120ms smooth tween with banking tilt)
+   * RESPONSIVE MOBILE SIZING (Comfortably fits lane width)
+   * ----------------------------------------------------------- */
+  applyResponsiveScale(laneWidth) {
+    // Keep auto-rickshaw comfortably sized: ~70% of lane width, between 0.72 and 1.0
+    const targetScale = Phaser.Math.Clamp((laneWidth * 0.70) / 84, 0.72, 1.0);
+    this.setScale(targetScale);
+
+    // Accurately adjust physics body hitbox
+    if (this.body) {
+      const bw = Math.round(this.width * targetScale - this.hitboxPaddingX * 2);
+      const bh = Math.round(this.height * targetScale - this.hitboxPaddingY * 2);
+      this.body.setSize(bw, bh);
+      this.body.setOffset(-bw / 2, -bh / 2);
+    }
+  }
+
+  /* -------------------------------------------------------------
+   * LANE SWITCHING (120ms smooth tween with subtle banking tilt)
    * ----------------------------------------------------------- */
   changeLane(direction) {
     if (!this.isAlive) return false;
@@ -103,11 +120,10 @@ export class PlayerAuto extends Phaser.GameObjects.Container {
     this.currentLane = nextLane;
     const targetX = this.scene.getLaneCenterX(this.currentLane);
 
-    if (this.laneTween) {
-      this.laneTween.stop();
-    }
+    // Cleanly cancel previous tweens on vehicle to prevent competing animations
+    this.scene.tweens.killTweensOf(this);
 
-    const tiltAngle = direction > 0 ? 0.12 : -0.12; // Bank into turn
+    const tiltAngle = direction > 0 ? 0.08 : -0.08; // Subtle natural bank into turn
     this.isChangingLane = true;
 
     // 120ms tween as specified in CONFIG
@@ -118,13 +134,14 @@ export class PlayerAuto extends Phaser.GameObjects.Container {
       duration: CONFIG.ROAD.LANE_TWEEN_DURATION,
       ease: 'Cubic.easeOut',
       onComplete: () => {
-        // Return rotation to straight
+        // Return rotation to straight smoothly
         this.scene.tweens.add({
           targets: this,
           rotation: 0,
-          duration: 60,
+          duration: 50,
           ease: 'Quad.easeOut',
           onComplete: () => {
+            this.rotation = 0;
             this.isChangingLane = false;
           }
         });
@@ -287,9 +304,8 @@ export class PlayerAuto extends Phaser.GameObjects.Container {
       }
     }
 
-    // Engine micro-vibration
-    this.idleTimer += delta * 0.02;
-    this.sprite.y = Math.sin(this.idleTimer) * 1.2;
+    // Keep sprite Y rock steady to prevent vertical shimmer/jitter during driving
+    this.sprite.y = 0;
   }
 
   crash() {

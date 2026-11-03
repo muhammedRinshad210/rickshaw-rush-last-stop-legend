@@ -90,6 +90,7 @@ export class GameScene extends Phaser.Scene {
     const selectedSkin = Storage.getSelectedSkin();
     const playerY = this.scale.height - 180;
     this.player = new PlayerAuto(this, this.getLaneCenterX(1), playerY, selectedSkin);
+    this.player.applyResponsiveScale(this.laneWidth);
 
     // 5. HUD
     this.hud = new HUD(this);
@@ -138,9 +139,19 @@ export class GameScene extends Phaser.Scene {
 
   updateRoadGeometry() {
     const w = this.scale.width;
-    // Keep road width proportional and comfortable across 9:16 portrait to 16:9 widescreen
-    this.roadWidth = Math.min(CONFIG.ROAD.WIDTH, w * 0.88);
-    this.roadLeftX = (w - this.roadWidth) / 2;
+    const h = this.scale.height;
+    const isPortrait = h >= w;
+
+    if (isPortrait) {
+      // Mobile target: 72% to 76% (74% median) of mobile viewport width
+      // Leaves 13% on either side for lush Kerala roadside scenery
+      this.roadWidth = Math.round(w * 0.74);
+    } else {
+      // Landscape & Desktop: comfortable road width bounded by viewport
+      this.roadWidth = Math.round(Math.min(CONFIG.ROAD.WIDTH, w * 0.52, h * 0.75));
+    }
+
+    this.roadLeftX = Math.round((w - this.roadWidth) / 2);
     this.roadRightX = this.roadLeftX + this.roadWidth;
     this.laneWidth = this.roadWidth / CONFIG.ROAD.LANES_COUNT;
   }
@@ -351,12 +362,15 @@ export class GameScene extends Phaser.Scene {
     // Handle Keyboard inputs
     this.handleKeyboardInputs();
 
+    // Clamp delta to avoid erratic frame-drop leap / jitter (clamped to max 33.3ms)
+    const clampedDelta = Math.min(delta, 33.33);
+
     if (this.isGameOver) {
-      this.player.update(delta);
+      this.player.update(clampedDelta);
       return;
     }
 
-    const deltaSeconds = delta / 1000;
+    const deltaSeconds = clampedDelta / 1000;
 
     // Calculate Dynamic Road Speed with Boost & Difficulty
     let targetSpeed = CONFIG.ROAD.SCROLL_SPEED_BASE * (1 + (this.spawner.difficultyLevel - 1) * 0.45);
@@ -375,10 +389,10 @@ export class GameScene extends Phaser.Scene {
     SoundFX.updateEngine(speedRatio);
 
     // Update Subsystems
-    this.environment.update(this.currentRoadSpeed, delta);
-    this.player.update(delta);
-    this.spawner.update(delta, this.currentRoadSpeed, this.player);
-    this.nearMissSystem.update(delta, this.player, this.spawner.obstacles);
+    this.environment.update(this.currentRoadSpeed, clampedDelta);
+    this.player.update(clampedDelta);
+    this.spawner.update(clampedDelta, this.currentRoadSpeed, this.player);
+    this.nearMissSystem.update(clampedDelta, this.player, this.spawner.obstacles);
     this.missionSystem.update(distDelta, this.spawner);
 
     // Update HUD
@@ -503,10 +517,15 @@ export class GameScene extends Phaser.Scene {
   onResize(gameSize) {
     this.updateRoadGeometry();
 
-    // Update Player position to match new lane X coordinate
+    // Update Player position & responsive scale to match new lane layout
     if (this.player && this.player.isAlive) {
+      this.player.applyResponsiveScale(this.laneWidth);
       this.player.x = this.getLaneCenterX(this.player.currentLane);
       this.player.y = gameSize.height - 180;
+    }
+
+    if (this.spawner) {
+      this.spawner.onResize(this.laneWidth);
     }
 
     if (this.environment) {

@@ -317,5 +317,24 @@ export class TrafficSpawner {
 
     return cowsScaredCount;
   }
+
+  onResize(laneWidth) {
+    this.obstacles.forEach(obs => {
+      obs.x = this.scene.getLaneCenterX(obs.lane);
+      obs.applyResponsiveScale(laneWidth);
+    });
+    this.coins.forEach(c => {
+      c.x = this.scene.getLaneCenterX(c.lane);
+    });
+    this.powerups.forEach(p => {
+      p.x = this.scene.getLaneCenterX(p.lane);
+    });
+    this.passengerStops.forEach(ps => {
+      ps.x = this.scene.getLaneCenterX(ps.lane);
+    });
+    this.dropoffZones.forEach(dz => {
+      dz.x = this.scene.getLaneCenterX(dz.lane);
+    });
+  }
 }
 

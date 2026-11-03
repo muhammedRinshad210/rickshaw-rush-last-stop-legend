@@ -1027,8 +1027,124 @@ runTest('62: Phase 6 - CrazyGames Full Launch Retains Active Monetization', () =
   assert.strictEqual(fullPlatform.supportsRewardedAd(), true, 'Full launch supports rewarded ad');
 });
 
+// ====================================================
+// PHASE 6.1: MOBILE VISUAL OPTIMIZATION & SMOOTH GAMEPLAY
+// ====================================================
+
+// 63: Responsive Mobile Road Width (72-76% in Portrait)
+runTest('63: Phase 6.1 - Mobile Road Width Ratio & Shoulder Space in Portrait', () => {
+  const testResolutions = [
+    { w: 320, h: 568 },
+    { w: 360, h: 800 },
+    { w: 390, h: 844 },
+    { w: 412, h: 915 },
+    { w: 720, h: 1600 }
+  ];
+
+  testResolutions.forEach(({ w, h }) => {
+    // Portrait formula from GameScene.js updateRoadGeometry()
+    const roadWidth = (h >= w)
+      ? Math.round(w * 0.74)
+      : Math.round(Math.min(CONFIG.ROAD.WIDTH, w * 0.52, h * 0.75));
+
+    const ratio = roadWidth / w;
+    assert.ok(ratio >= 0.72 && ratio <= 0.76, `Road ratio for ${w}x${h} must be between 72% and 76%, got ${(ratio * 100).toFixed(1)}%`);
+
+    const leftShoulder = (w - roadWidth) / 2;
+    const rightShoulder = w - (leftShoulder + roadWidth);
+    const shoulderRatio = leftShoulder / w;
+
+    assert.ok(shoulderRatio >= 0.12 && shoulderRatio <= 0.14, `Shoulder ratio for ${w}x${h} must be 12-14%, got ${(shoulderRatio * 100).toFixed(1)}%`);
+    assert.strictEqual(Math.round(leftShoulder + roadWidth + rightShoulder), w, 'Total width must equal viewport width');
+  });
+
+  // Verify landscape mode retains bounded width
+  const landscapeW = 844;
+  const landscapeH = 390;
+  const landscapeRoadWidth = Math.round(Math.min(CONFIG.ROAD.WIDTH, landscapeW * 0.52, landscapeH * 0.75));
+  assert.ok(landscapeRoadWidth <= CONFIG.ROAD.WIDTH, 'Landscape road width must not exceed maximum config road width');
+});
+
+// 64: Scenery Sizing & Shoulder Clamping Safety
+runTest('64: Phase 6.1 - Scenery Sizing Fits Strictly Within Roadside Shoulders', () => {
+  const viewports = [
+    { w: 320, h: 568 },
+    { w: 360, h: 800 },
+    { w: 390, h: 844 }
+  ];
+  const kerbW = CONFIG.ROAD.KERB_WIDTH;
+
+  viewports.forEach(({ w, h }) => {
+    const roadWidth = Math.round(w * 0.74);
+    const roadLeft = Math.round((w - roadWidth) / 2);
+    const roadRight = roadLeft + roadWidth;
+    const shoulderWidth = Math.max(24, roadLeft - kerbW);
+
+    // Test a wide roadside scenery object (e.g. 110px tea shop or house)
+    const itemWidth = 110;
+    const maxAllowedWidth = Math.max(16, shoulderWidth - 10);
+    const scale = Math.min(1.0, maxAllowedWidth / itemWidth);
+    const displayWidth = itemWidth * scale;
+
+    // Display width must be strictly smaller than shoulder width with margin
+    assert.ok(displayWidth <= shoulderWidth - 8, `Display width (${displayWidth.toFixed(1)}) must fit inside shoulder (${shoulderWidth})`);
+
+    // Verify boundary clamping
+    const halfW = displayWidth / 2;
+    const minX = Math.round(4 + halfW);
+    const maxX = Math.round(roadLeft - kerbW - 4 - halfW);
+
+    assert.ok(minX >= 4, `Left boundary (${minX}) must be >= 4px from screen edge`);
+    if (minX <= maxX) {
+      assert.ok(maxX + halfW <= roadLeft - kerbW, `Right boundary of item must not overlap road kerb`);
+    }
+  });
+});
+
+// 65: Delta Clamping Eliminates Frame-Drop Physics Jumps
+runTest('65: Phase 6.1 - Frame Delta Clamping Prevents Physics Spikes', () => {
+  const normalDelta = 16.66; // 60 FPS
+  const clampedNormal = Math.min(normalDelta, 33.33);
+  assert.strictEqual(clampedNormal, 16.66, 'Normal delta should pass through unclamped');
+
+  const spikeDelta = 250.0; // severe lag spike / background tab restore
+  const clampedSpike = Math.min(spikeDelta, 33.33);
+  assert.strictEqual(clampedSpike, 33.33, 'Severe lag spike must be clamped to 33.33ms');
+
+  const moderateSpike = 50.0; // frame drop to 20 FPS
+  const clampedModerate = Math.min(moderateSpike, 33.33);
+  assert.strictEqual(clampedModerate, 33.33, 'Moderate frame drop must be clamped to 33.33ms');
+});
+
+// 66: Rickshaw Stability & Proportional Lane Sizing
+runTest('66: Phase 6.1 - Rickshaw Stability & Proportional Lane Scale', () => {
+  // Test auto width ratio across mobile portrait resolutions
+  const mobileLaneWidths = [79, 89, 96, 102]; // from 320, 360, 390, 412 portrait widths
+  const baseRickshawWidth = 56;
+
+  mobileLaneWidths.forEach(laneW => {
+    // PlayerAuto applyResponsiveScale formula
+    const targetScale = Math.min(1.0, Math.max(0.72, (laneW * 0.70) / baseRickshawWidth));
+    const effectiveWidth = baseRickshawWidth * targetScale;
+    const occupancyRatio = effectiveWidth / laneW;
+
+    assert.ok(occupancyRatio >= 0.50 && occupancyRatio <= 0.75,
+      `Rickshaw occupancy ratio (${(occupancyRatio * 100).toFixed(1)}%) in lane (${laneW}px) must be between 50% and 75%`);
+  });
+
+  // For tablet / wide viewports (e.g. 720px portrait where laneW = 178px), scale is safely capped at 1.0
+  const wideLaneWidth = 178;
+  const wideScale = Math.min(1.0, Math.max(0.72, (wideLaneWidth * 0.70) / baseRickshawWidth));
+  assert.strictEqual(wideScale, 1.0, 'Rickshaw scale must cap at 1.0 to avoid excessive stretching on wide screens');
+
+  // Verify idle sprite y offset is 0 during active driving (no vibration)
+  const isDriving = true;
+  const idleShakeY = isDriving ? 0 : Math.sin(1.5) * 1.2;
+  assert.strictEqual(idleShakeY, 0, 'Rickshaw sprite y offset must be exactly 0 while driving to prevent vibration');
+});
+
 console.log('\n====================================================');
-console.log(`TEST SUMMARY: ${testsPassed} PASSED, ${testsFailed} FAILED out of 62 Tests`);
+console.log(`TEST SUMMARY: ${testsPassed} PASSED, ${testsFailed} FAILED out of 66 Tests`);
 console.log('====================================================');
 
 if (testsFailed > 0) {

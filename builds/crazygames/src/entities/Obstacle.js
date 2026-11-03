@@ -35,7 +35,20 @@ export class Obstacle extends Phaser.GameObjects.Container {
     this.speedFactor = this.config.speedFactor; // Relative to road scroll
     this.active = true;
 
+    this.applyResponsiveScale(scene.laneWidth);
+
     scene.add.existing(this);
+  }
+
+  applyResponsiveScale(laneWidth = 156) {
+    const scale = Phaser.Math.Clamp((laneWidth * 0.70) / 84, 0.70, 1.0);
+    this.setScale(scale);
+    if (this.body) {
+      const bw = Math.round(this.width * scale - this.config.hitboxPaddingX * 2);
+      const bh = Math.round(this.height * scale - this.config.hitboxPaddingY * 2);
+      this.body.setSize(bw, bh);
+      this.body.setOffset(-bw / 2, -bh / 2);
+    }
   }
 
   reset(x, y, type, lane) {
@@ -70,6 +83,7 @@ export class Obstacle extends Phaser.GameObjects.Container {
     this.active = true;
     this.setVisible(true);
     this.rotation = 0;
+    this.applyResponsiveScale(this.scene.laneWidth);
   }
 
   /* -------------------------------------------------------------
