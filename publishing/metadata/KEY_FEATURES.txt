@@ -1,0 +1,12 @@
+KEY FEATURES:
+
+• AUTHENTIC KERALA ENDLESS ROAD TRIP: Experience 5 seamless locations transitioning from village paddy fields to Alappuzha backwaters, Cherai coastal beach, misty Munnar tea hills, and an endless Kochi town at night.
+• DEDICATED KERALA MONSOON MODE: Experience authentic Kerala tropical weather with dynamic rain particles, roadside puddles, lightning flashes, post-storm rainbows, and procedural Web Audio rain ambience.
+• UNIQUE PASSENGER MISSIONS: Board diverse Kerala commuters (students, tourists, office workers, grandmas) and deliver them to designated destinations for big fare bonuses.
+• SKILL-BASED NEAR-MISS COMBOS: High-risk close overtakes reward twitch reflexes with combo multipliers up to 5x and floating arcade praise.
+• COW SCARING HORN MECHANIC: Interactive wildlife management—blast your dual-tone air horn to safely divert cows blocking traffic.
+• 5 UNLOCKABLE AUTO SKINS: Customize your rickshaw in the Garage with Classic Green, Champion Gold, Malabar Red, Backwater Blue, and Racing Green designs.
+• PROCEDURAL WEB AUDIO API SOUNDTRACK: Zero external audio files—every engine drone, tire screech, thunder rumble, horn blast, and coin chime is synthesized in real time.
+• MULTI-PLATFORM RESPONSIVE ENGINE: Flawlessly scales across mobile phones (portrait 9:16), tablets, and desktop displays (landscape 16:9) with ultra-fast sub-400ms loading.
+• COMPLIANT PLATFORM INTEGRATION: Ready for CrazyGames SDK v3, Poki SDK v2, YouTube Playables API v1, and Standalone Web.
+

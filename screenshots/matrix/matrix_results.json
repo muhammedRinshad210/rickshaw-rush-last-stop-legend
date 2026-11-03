@@ -1,0 +1,58 @@
+[
+  {
+    "device": "Android Phone (Portrait)",
+    "resolution": "390x844",
+    "status": "PASS",
+    "sizeBytes": 34186,
+    "timeMs": 2705
+  },
+  {
+    "device": "Android Phone (Landscape)",
+    "resolution": "844x390",
+    "status": "PASS",
+    "sizeBytes": 38727,
+    "timeMs": 1712
+  },
+  {
+    "device": "Tablet (3:4 Portrait)",
+    "resolution": "768x1024",
+    "status": "PASS",
+    "sizeBytes": 79191,
+    "timeMs": 1757
+  },
+  {
+    "device": "Desktop Chrome (720p)",
+    "resolution": "1280x720",
+    "status": "PASS",
+    "sizeBytes": 63510,
+    "timeMs": 1715
+  },
+  {
+    "device": "Desktop Edge (1080p)",
+    "resolution": "1920x1080",
+    "status": "PASS",
+    "sizeBytes": 145876,
+    "timeMs": 32806
+  },
+  {
+    "device": "Incognito Browser Profile",
+    "resolution": "412x915",
+    "status": "PASS",
+    "sizeBytes": 36867,
+    "timeMs": 2447
+  },
+  {
+    "device": "Small Viewport (Compact Phone)",
+    "resolution": "320x568",
+    "status": "PASS",
+    "sizeBytes": 32727,
+    "timeMs": 1756
+  },
+  {
+    "device": "Large Viewport (2K Ultrawide)",
+    "resolution": "2560x1440",
+    "status": "PASS",
+    "sizeBytes": 190573,
+    "timeMs": 15866
+  }
+]

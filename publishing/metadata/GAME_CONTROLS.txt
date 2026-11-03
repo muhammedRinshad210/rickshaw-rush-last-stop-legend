@@ -1,0 +1,23 @@
+GAME CONTROLS:
+
+MOBILE / TOUCH DEVICES:
+• Swipe Left / Right: Switch traffic lanes.
+• Tap Left Half / Right Half: Steer left or right.
+• Tap Horn Button (Bottom Right): Honk dual-tone auto horn to scare cows.
+• Tap Brake Zone (Bottom Center): Slow down for passenger boarding and tight traffic gaps.
+• Tap Pause Button (Top Right): Pause gameplay and open options.
+
+KEYBOARD (DESKTOP):
+• A / Left Arrow: Steer Left
+• D / Right Arrow: Steer Right
+• W / Up Arrow: Accelerate / Resume Normal Speed
+• S / Down Arrow: Brake / Slow Down for Passenger Stations
+• Spacebar / H: Honk Horn (Scares cows)
+• P / Escape: Pause / Resume Game
+
+MOUSE:
+• Click Left / Right Side of Screen: Change lanes
+• Click On-Screen Horn Button: Honk Horn
+• Click On-Screen Brake Button: Brake
+• Click UI Buttons: Navigate menus and garage
+

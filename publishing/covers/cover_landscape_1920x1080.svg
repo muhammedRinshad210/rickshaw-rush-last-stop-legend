@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#01579B" />
+      <stop offset="35%" stop-color="#0288D1" />
+      <stop offset="65%" stop-color="#4FC3F7" />
+      <stop offset="90%" stop-color="#FFE082" />
+      <stop offset="100%" stop-color="#FFB300" />
+    </linearGradient>
+    <linearGradient id="seaGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0288D1" />
+      <stop offset="100%" stop-color="#00695C" />
+    </linearGradient>
+    <linearGradient id="hillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#388E3C" />
+      <stop offset="100%" stop-color="#1B5E20" />
+    </linearGradient>
+    <linearGradient id="roadSurf" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#37474F" />
+      <stop offset="100%" stop-color="#1C2833" />
+    </linearGradient>
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9C4" />
+      <stop offset="45%" stop-color="#FFD54F" />
+      <stop offset="75%" stop-color="#FFA000" />
+      <stop offset="100%" stop-color="#E65100" />
+    </linearGradient>
+    <filter id="bigShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="14" stdDeviation="6" flood-color="#000000" flood-opacity="0.7" />
+    </filter>
+  </defs>
+
+  <!-- Sky Background -->
+  <rect width="1920" height="1080" fill="url(#skyGrad)" />
+
+  <!-- Distant Munnar Mountains -->
+  <path d="M 0 540 Q 240 400, 520 480 T 1100 450 T 1600 490 Q 1780 430, 1920 480 L 1920 720 L 0 720 Z" fill="url(#hillGrad)" opacity="0.65" />
+  <path d="M 0 580 Q 360 480, 720 540 T 1440 520 Q 1720 490, 1920 540 L 1920 760 L 0 760 Z" fill="url(#hillGrad)" opacity="0.85" />
+
+  <!-- Backwaters / Arabian Sea Coastline -->
+  <rect y="640" width="1920" height="160" fill="url(#seaGrad)" />
+  <path d="M 0 680 Q 480 660, 960 680 T 1920 680 L 1920 740 L 0 740 Z" fill="#00897B" opacity="0.6" />
+
+  <!-- Traditional Kerala Houseboat (Kettuvallam) Silhouette -->
+  <g transform="translate(320, 650) scale(0.65)" opacity="0.95">
+    <path d="M -90 20 C -70 -15, 70 -15, 90 20 Z" fill="#5D4037" />
+    <path d="M -60 10 C -50 -10, 50 -10, 60 10 Z" fill="#8D6E63" />
+    <!-- Thatched Arch Roof -->
+    <path d="M -50 0 C -40 -28, 40 -28, 50 0 Z" fill="#D7CCC8" stroke="#3E2723" stroke-width="2" />
+  </g>
+
+  <!-- Foreground Kerala Roadway (Dynamic Angle) -->
+  <polygon points="0,1080 1920,1080 1480,680 440,680" fill="url(#roadSurf)" />
+  <!-- Road Curbs (Kerala Yellow & Black) -->
+  <polygon points="400,680 440,680 0,1080 -60,1080" fill="#FFA000" />
+  <polygon points="1480,680 1520,680 1980,1080 1920,1080" fill="#FFA000" />
+  <!-- Center Dashed Lanes -->
+  <line x1="960" y1="690" x2="960" y2="1080" stroke="#FFD54F" stroke-width="16" stroke-dasharray="55,40" />
+  <line x1="720" y1="690" x2="480" y2="1080" stroke="#FFFFFF" stroke-width="8" stroke-dasharray="45,35" opacity="0.8" />
+  <line x1="1200" y1="690" x2="1440" y2="1080" stroke="#FFFFFF" stroke-width="8" stroke-dasharray="45,35" opacity="0.8" />
+
+  <!-- Tropical Coconut Palms (Framing Both Sides) -->
+  <g fill="#1B5E20">
+    <!-- Left Palm -->
+    <path d="M -20 750 Q 80 500, 160 300 Q 120 480, 20 750 Z" fill="#4E342E" />
+    <path d="M 160 300 Q 280 260, 420 320 Q 300 360, 160 300 Z" />
+    <path d="M 160 300 Q 260 180, 360 140 Q 280 240, 160 300 Z" />
+    <path d="M 160 300 Q 140 160, 100 80 Q 120 220, 160 300 Z" />
+    <path d="M 160 300 Q 60 180, -20 200 Q 80 260, 160 300 Z" />
+    <!-- Right Palm -->
+    <path d="M 1940 750 Q 1840 500, 1760 300 Q 1800 480, 1900 750 Z" fill="#4E342E" />
+    <path d="M 1760 300 Q 1640 260, 1500 320 Q 1620 360, 1760 300 Z" />
+    <path d="M 1760 300 Q 1660 180, 1560 140 Q 1640 240, 1760 300 Z" />
+    <path d="M 1760 300 Q 1780 160, 1820 80 Q 1800 220, 1760 300 Z" />
+  </g>
+
+  <!-- Speed Motion Effects / Wind Streaks -->
+  <g stroke="#FFFFFF" stroke-width="4" opacity="0.45">
+    <line x1="280" y1="920" x2="680" y2="880" />
+    <line x1="1240" y1="880" x2="1680" y2="920" />
+    <line x1="380" y1="800" x2="640" y2="780" />
+    <line x1="1280" y1="780" x2="1540" y2="800" />
+  </g>
+
+  <!-- MAIN HERO AUTO-RICKSHAW (Dramatic Dynamic Front Pose) -->
+  <g transform="translate(960, 840)" filter="url(#bigShadow)">
+    <!-- Ground Shadow -->
+    <ellipse cx="0" cy="180" rx="220" ry="38" fill="#000000" opacity="0.55" />
+
+    <!-- Big Wheels -->
+    <rect x="-210" y="90" width="46" height="84" rx="14" fill="#212121" stroke="#424242" stroke-width="4" />
+    <rect x="164" y="90" width="46" height="84" rx="14" fill="#212121" stroke="#424242" stroke-width="4" />
+    <rect x="-25" y="115" width="50" height="70" rx="12" fill="#212121" stroke="#424242" stroke-width="4" />
+
+    <!-- Chassis Base -->
+    <path d="M -190 115 L 190 115 L 175 65 L -175 65 Z" fill="#212121" />
+
+    <!-- Lower Green Cabin -->
+    <path d="M -180 70 L 180 70 L 155 -35 L -155 -35 Z" fill="#2E7D32" stroke="#1B5E20" stroke-width="6" />
+
+    <!-- Chrome Heavy Front Bumper -->
+    <rect x="-170" y="58" width="340" height="20" rx="6" fill="#ECEFF1" stroke="#B0BEC5" stroke-width="3" />
+
+    <!-- Mega Headlamp with Glow -->
+    <circle cx="0" cy="22" r="38" fill="#FFFDE7" stroke="#FFA000" stroke-width="6" />
+    <circle cx="0" cy="22" r="22" fill="#FFFFFF" />
+    <!-- Indicators -->
+    <circle cx="-120" cy="22" r="14" fill="#FF9800" stroke="#E65100" stroke-width="3" />
+    <circle cx="120" cy="22" r="14" fill="#FF9800" stroke="#E65100" stroke-width="3" />
+
+    <!-- Windshield -->
+    <polygon points="-140,-35 140,-35 115,-145 -115,-145" fill="#E0F7FA" stroke="#00838F" stroke-width="5" />
+    <line x1="0" y1="-145" x2="0" y2="-35" stroke="#00838F" stroke-width="4" />
+    <line x1="-50" y1="-45" x2="40" y2="-115" stroke="#212121" stroke-width="6" stroke-linecap="round" />
+
+    <!-- Iconic Yellow Curved Canopy Roof -->
+    <path d="M -165 -140 C -125 -205, 125 -205, 165 -140 L 140 -120 L -140 -120 Z" fill="#FFB300" stroke="#E65100" stroke-width="6" />
+    <ellipse cx="0" cy="-155" rx="75" ry="14" fill="#FFF59D" opacity="0.6" />
+
+    <!-- Rear-View Mirrors -->
+    <rect x="-190" y="-70" width="22" height="38" rx="6" fill="#CFD8DC" stroke="#37474F" stroke-width="3" />
+    <rect x="168" y="-70" width="22" height="38" rx="6" fill="#CFD8DC" stroke="#37474F" stroke-width="3" />
+  </g>
+
+  <!-- Floating Coins / Power-ups Effect -->
+  <g transform="translate(680, 780)" filter="url(#bigShadow)">
+    <circle cx="0" cy="0" r="28" fill="#FFD54F" stroke="#FFA000" stroke-width="4" />
+    <text x="0" y="8" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#E65100">★</text>
+  </g>
+  <g transform="translate(1240, 760)" filter="url(#bigShadow)">
+    <circle cx="0" cy="0" r="28" fill="#FFD54F" stroke="#FFA000" stroke-width="4" />
+    <text x="0" y="8" font-family="sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#E65100">★</text>
+  </g>
+
+  <!-- TOP BRANDING & PROMOTIONAL TITLE CARD -->
+  <g transform="translate(960, 180)" filter="url(#bigShadow)">
+    <!-- Backdrop Banner Box -->
+    <rect x="-620" y="-120" width="1240" height="240" rx="28" fill="#1B5E20" opacity="0.92" stroke="#FFD54F" stroke-width="6" />
+
+    <!-- RICKSHAW RUSH Text -->
+    <text x="0" y="-10" font-family="'Impact', 'Arial Black', sans-serif" font-size="112" font-weight="900" text-anchor="middle" letter-spacing="10" fill="url(#goldText)" stroke="#3E2723" stroke-width="6" stroke-linejoin="round">RICKSHAW RUSH</text>
+
+    <!-- LAST STOP LEGEND Ribbon -->
+    <g transform="translate(0, 52)">
+      <path d="M -260 -18 L 260 -18 L 240 18 L -240 18 Z" fill="#D32F2F" stroke="#FFD54F" stroke-width="2.5" />
+      <text x="0" y="7" font-family="'Arial Black', sans-serif" font-size="24" font-weight="900" text-anchor="middle" letter-spacing="6" fill="#FFFFFF">LAST STOP LEGEND</text>
+    </g>
+
+    <!-- Tagline -->
+    <text x="0" y="98" font-family="sans-serif" font-size="20" font-weight="800" text-anchor="middle" letter-spacing="6" fill="#FFE082">PICK UP. DODGE. DELIVER. REPEAT.</text>
+  </g>
+</svg>

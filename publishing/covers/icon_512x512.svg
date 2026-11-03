@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0288D1" />
+      <stop offset="55%" stop-color="#4FC3F7" />
+      <stop offset="85%" stop-color="#FFF9C4" />
+      <stop offset="100%" stop-color="#FFE082" />
+    </linearGradient>
+    <linearGradient id="roadGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#263238" />
+      <stop offset="100%" stop-color="#1A252F" />
+    </linearGradient>
+    <linearGradient id="yellowRoof" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF176" />
+      <stop offset="60%" stop-color="#FFA000" />
+      <stop offset="100%" stop-color="#FF6F00" />
+    </linearGradient>
+    <linearGradient id="greenBody" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4CAF50" />
+      <stop offset="60%" stop-color="#2E7D32" />
+      <stop offset="100%" stop-color="#1B5E20" />
+    </linearGradient>
+    <linearGradient id="goldText" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9C4" />
+      <stop offset="50%" stop-color="#FFD54F" />
+      <stop offset="100%" stop-color="#FFA000" />
+    </linearGradient>
+    <filter id="iconShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="4" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <!-- Rounded App Icon Background -->
+  <rect width="512" height="512" rx="105" fill="url(#bgSky)" />
+
+  <!-- Tropical Palm Tree Silhouette (Kerala Touch) -->
+  <g fill="#2E7D32" opacity="0.9">
+    <path d="M 0 0 C 80 40, 140 100, 180 200 C 140 180, 80 140, 0 100 Z" />
+    <path d="M 512 0 C 432 40, 372 100, 332 200 C 372 180, 432 140, 512 100 Z" />
+  </g>
+
+  <!-- Road & Perspective Lines -->
+  <polygon points="120,512 392,512 300,260 212,260" fill="url(#roadGrad)" />
+  <line x1="256" y1="280" x2="256" y2="512" stroke="#FFD54F" stroke-width="8" stroke-dasharray="24,18" />
+  <!-- Road Curbs (Yellow/Black) -->
+  <polygon points="100,512 120,512 212,260 200,260" fill="#E65100" />
+  <polygon points="392,512 412,512 312,260 300,260" fill="#E65100" />
+
+  <!-- Dynamic Speed Action Lines -->
+  <g stroke="#FFFFFF" stroke-width="3" opacity="0.6">
+    <line x1="40" y1="420" x2="110" y2="400" />
+    <line x1="472" y1="420" x2="402" y2="400" />
+    <line x1="30" y1="360" x2="120" y2="340" />
+    <line x1="482" y1="360" x2="392" y2="340" />
+  </g>
+
+  <!-- Primary Subject: Hero Auto-Rickshaw (Centered & Powerful) -->
+  <g transform="translate(256, 310)" filter="url(#iconShadow)">
+    <!-- Shadow under vehicle -->
+    <ellipse cx="0" cy="115" rx="130" ry="24" fill="#000000" opacity="0.45" />
+
+    <!-- Wheels (Front & Rear) -->
+    <rect x="-124" y="65" width="28" height="52" rx="8" fill="#212121" stroke="#424242" stroke-width="3" />
+    <rect x="96" y="65" width="28" height="52" rx="8" fill="#212121" stroke="#424242" stroke-width="3" />
+    <rect x="-16" y="80" width="32" height="42" rx="8" fill="#212121" stroke="#424242" stroke-width="3" />
+
+    <!-- Chassis Base & Mudguards -->
+    <path d="M -115 80 L 115 80 L 105 50 L -105 50 Z" fill="#212121" />
+
+    <!-- Lower Green Cabin Body -->
+    <path d="M -110 52 L 110 52 L 95 -15 L -95 -15 Z" fill="url(#greenBody)" stroke="#1B5E20" stroke-width="4" />
+
+    <!-- Chrome Bumper -->
+    <rect x="-105" y="44" width="210" height="12" rx="4" fill="#ECEFF1" stroke="#B0BEC5" stroke-width="2" />
+
+    <!-- Large Iconic Center Headlamp -->
+    <circle cx="0" cy="22" r="24" fill="#FFFDE7" stroke="#FFA000" stroke-width="4" />
+    <circle cx="0" cy="22" r="14" fill="#FFFFFF" />
+    <!-- Indicator Lights -->
+    <circle cx="-75" cy="22" r="9" fill="#FF9800" stroke="#E65100" stroke-width="2" />
+    <circle cx="75" cy="22" r="9" fill="#FF9800" stroke="#E65100" stroke-width="2" />
+
+    <!-- Windshield Pillar Structure -->
+    <polygon points="-86,-15 86,-15 72,-85 -72,-85" fill="#E0F7FA" stroke="#00838F" stroke-width="3" />
+    <line x1="0" y1="-85" x2="0" y2="-15" stroke="#00838F" stroke-width="3" />
+    <!-- Wiper -->
+    <line x1="-30" y1="-20" x2="20" y2="-60" stroke="#212121" stroke-width="4" stroke-linecap="round" />
+
+    <!-- Top Canopy Yellow Roof -->
+    <path d="M -102 -82 C -80 -125, 80 -125, 102 -82 L 86 -70 L -86 -70 Z" fill="url(#yellowRoof)" stroke="#E65100" stroke-width="4" />
+    <ellipse cx="0" cy="-90" rx="45" ry="8" fill="#FFF59D" opacity="0.5" />
+
+    <!-- Rear-view Mirrors -->
+    <rect x="-115" y="-35" width="14" height="24" rx="4" fill="#CFD8DC" stroke="#37474F" stroke-width="2" />
+    <rect x="101" y="-35" width="14" height="24" rx="4" fill="#CFD8DC" stroke="#37474F" stroke-width="2" />
+  </g>
+
+  <!-- Title Badge on Bottom -->
+  <g transform="translate(256, 455)" filter="url(#iconShadow)">
+    <rect x="-175" y="-32" width="350" height="64" rx="14" fill="#1B5E20" stroke="#FFD54F" stroke-width="4" />
+    <text x="0" y="6" font-family="'Impact', 'Arial Black', sans-serif" font-size="34" font-weight="900" text-anchor="middle" letter-spacing="4" fill="url(#goldText)" stroke="#3E2723" stroke-width="2">RICKSHAW RUSH</text>
+  </g>
+</svg>

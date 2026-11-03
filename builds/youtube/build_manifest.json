@@ -1,0 +1,24 @@
+{
+  "platformId": "youtube",
+  "name": "YouTube Playables Certified Build",
+  "description": "Compliant with YouTube Playables Certification and game_api/v1.",
+  "version": "1.3.0",
+  "buildTimestamp": "2026-11-03T02:06:57.268Z",
+  "entryPoint": "index.html",
+  "runtimeEngine": "4.2.1 (Phaser 3 API Compatible)",
+  "sdkVersion": "YouTube Playables Game API v1",
+  "targetMarket": "YouTube Playables Game Store",
+  "totalFiles": 30,
+  "uncompressedSizeKB": 1595.5,
+  "uncompressedSizeMB": 1.56,
+  "compliance": {
+    "offlineReady": false,
+    "sdkPrecedesGameCode": true,
+    "firstFrameReadyHook": true,
+    "gameReadyHook": true,
+    "cloudSaveData": true,
+    "sendScoreSupport": true,
+    "audioMuteIntegration": true,
+    "zeroThirdPartyCalls": true
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "platformId": "crazygames",
+  "name": "CrazyGames SDK v3 Build",
+  "description": "Compliant with CrazyGames SDK v3 specification for Basic and Full Launch.",
+  "version": "1.3.0",
+  "buildTimestamp": "2026-11-03T02:06:57.268Z",
+  "entryPoint": "index.html",
+  "runtimeEngine": "4.2.1 (Phaser 3 API Compatible)",
+  "sdkVersion": "CrazyGames SDK v3",
+  "targetMarket": "CrazyGames Web Portal",
+  "totalFiles": 30,
+  "uncompressedSizeKB": 1595.5,
+  "uncompressedSizeMB": 1.56,
+  "compliance": {
+    "basicLaunchReady": true,
+    "fullLaunchReady": true,
+    "gameplayLifecycleHooks": true,
+    "interstitialMidgameAd": true,
+    "rewardedAdSupport": true,
+    "happytimeHook": true,
+    "audioMuteDuringAds": true
+  }
+}

@@ -1,0 +1,16 @@
+DEVELOPER INFORMATION:
+
+Game Title: RICKSHAW RUSH: LAST STOP LEGEND
+Version: 1.3.0
+Genre: Arcade / Endless Runner / Driving Simulation
+Engine: Phaser 4.2.1 (Phaser 3 API compatible runtime, bundled locally)
+Technology: HTML5, CSS3, JavaScript (ES6 Modules), Web Audio API, Canvas / WebGL
+Asset Type: 100% Original Procedural Vector Graphics & Synthesized Procedural Audio
+External Dependencies: None (zero external CDN calls, self-contained offline bundle)
+License: Proprietary / Commercial Publishing Ready
+Developer / Publisher: Independent Game Studio (Self-Published HTML5 Arcade Division)
+Contact / Support Email: dev@rickshawrush.game (Representative Developer Portal)
+Target Portals: CrazyGames, Poki, YouTube Playables, Standalone Web (Itch.io)
+Target Audience: All Ages (Family Friendly / Casual Arcade / Mobile & Desktop)
+Release Status: Production Release Candidate (Phase 5 Complete)
+

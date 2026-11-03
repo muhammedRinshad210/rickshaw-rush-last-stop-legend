@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Rickshaw Rush Official Trailer Generator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; background: #000; overflow: hidden; }
+    body { display: flex; align-items: center; justify-content: center; width: 100vw; height: 100vh; }
+    canvas { width: 1280px; height: 720px; display: block; box-shadow: 0 0 40px rgba(0,0,0,0.8); }
+    #status { position: absolute; top: 10px; left: 10px; color: #FFF; font-family: sans-serif; font-size: 14px; background: rgba(0,0,0,0.7); padding: 6px 12px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div id="status">Loading Trailer Assets...</div>
+  <canvas id="trailerCanvas" width="1280" height="720"></canvas>
+
+  <script>
+    const canvas = document.getElementById('trailerCanvas');
+    const ctx = canvas.getContext('2d');
+    const statusEl = document.getElementById('status');
+
+    // Load actual game assets
+    const images = {};
+    const imgSources = {
+      cover: '/publishing/covers/cover_landscape_1920x1080.png',
+      logo: '/publishing/branding/logo_main.png',
+      village: '/publishing/screenshots/01_village_gameplay.png',
+      backwaters: '/publishing/screenshots/02_backwaters_gameplay.png',
+      beach: '/publishing/screenshots/03_beach_gameplay.png',
+      munnar: '/publishing/screenshots/04_munnar_gameplay.png',
+      monsoon: '/publishing/screenshots/06_kerala_monsoon_gameplay.png',
+      pickup: '/publishing/screenshots/07_passenger_pickup.png',
+      delivery: '/publishing/screenshots/08_passenger_delivery.png',
+      garage: '/publishing/screenshots/09_rickshaw_garage.png',
+    };
+
+    let loadedCount = 0;
+    const totalImgs = Object.keys(imgSources).length;
+
+    for (const [key, src] of Object.entries(imgSources)) {
+      const img = new Image();
+      img.onload = () => {
+        loadedCount++;
+        images[key] = img;
+        if (loadedCount === totalImgs) {
+          statusEl.innerText = 'Ready. Starting Recording...';
+          startTrailer();
+        }
+      };
+      img.src = src;
+    }
+
+    function startTrailer() {
+      const stream = canvas.captureStream(30);
+      let recorder;
+      try {
+        recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp8', videoBitsPerSecond: 3000000 });
+      } catch (e) {
+        recorder = new MediaRecorder(stream);
+      }
+
+      const chunks = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = async () => {
+        statusEl.innerText = 'Encoding complete. Uploading WebM...';
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        try {
+          await fetch('/save_trailer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'video/webm' },
+            body: blob
+          });
+          statusEl.innerText = '✓ Video saved successfully!';
+          window.trailerDone = true;
+        } catch (err) {
+          statusEl.innerText = 'Error saving video: ' + err.message;
+        }
+      };
+
+      recorder.start();
+
+      const startTime = performance.now();
+      const TOTAL_DURATION = 26000; // 26 seconds
+
+      function renderFrame() {
+        const now = performance.now();
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / TOTAL_DURATION, 1.0);
+        const sec = elapsed / 1000;
+
+        // Clear canvas
+        ctx.fillStyle = '#1A252F';
+        ctx.fillRect(0, 0, 1280, 720);
+
+        // --- SEQUENCE TIMELINE ---
+        if (sec < 3.5) {
+          // 0-3.5s: Title Hook & Hero Auto
+          renderIntro(sec);
+        } else if (sec < 7.5) {
+          // 3.5-7.5s: Village Road & Traffic Dodging
+          renderGameplaySection(images.village, 'DODGE CHAOTIC TRAFFIC!', 'KERALA VILLAGE', sec - 3.5, 4.0);
+        } else if (sec < 11.5) {
+          // 7.5-11.5s: Backwaters & Houseboats
+          renderGameplaySection(images.backwaters, 'EXPLORE BACKWATERS & CANALS!', 'ALAPPUZHA', sec - 7.5, 4.0);
+        } else if (sec < 15.5) {
+          // 11.5-15.5s: Beach & Munnar Hills
+          renderGameplaySplit(images.beach, images.munnar, '5 ICONIC KERALA LOCATIONS!', sec - 11.5, 4.0);
+        } else if (sec < 19.5) {
+          // 15.5-19.5s: Monsoon Mode & Passenger Delivery
+          renderGameplaySection(images.monsoon, 'BRAVE THE MONSOON DELUGE!', 'KERALA MONSOON MODE', sec - 15.5, 4.0, true);
+        } else if (sec < 23.5) {
+          // 19.5-23.5s: Passenger Pickups & Combos
+          renderGameplaySplit(images.pickup, images.delivery, 'PICK UP PASSENGERS • EARN FARES!', sec - 19.5, 4.0);
+        } else {
+          // 23.5-26.0s: Outro Card
+          renderOutro(sec - 23.5);
+        }
+
+        // Global Border / Letterbox
+        renderCinematicVignette();
+
+        if (elapsed < TOTAL_DURATION) {
+          requestAnimationFrame(renderFrame);
+        } else {
+          recorder.stop();
+        }
+      }
+
+      requestAnimationFrame(renderFrame);
+    }
+
+    function renderIntro(t) {
+      // Background Cover
+      if (images.cover) {
+        const scale = 1.0 + t * 0.04;
+        ctx.save();
+        ctx.translate(640, 360);
+        ctx.scale(scale, scale);
+        ctx.drawImage(images.cover, -640, -360, 1280, 720);
+        ctx.restore();
+      }
+
+      // Dark Overlay
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Main Logo
+      if (images.logo) {
+        const logoY = 160 + Math.sin(t * 3) * 6;
+        ctx.drawImage(images.logo, 140, logoY, 1000, 312);
+      }
+
+      // Callout
+      drawBannerText('GET READY FOR GOD’S OWN ARCADE RUSH!', 600, '#FFD54F', 34);
+    }
+
+    function renderGameplaySection(img, bannerText, locationName, t, dur, isRain = false) {
+      if (!img) return;
+
+      // Draw gameplay phone preview centered in stylized arcade display
+      const panY = -80 + (t / dur) * 120;
+      
+      // Blurred ambient background
+      ctx.save();
+      ctx.filter = 'blur(16px)';
+      ctx.drawImage(img, -200, panY - 100, 1680, 1000);
+      ctx.restore();
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+      ctx.fillRect(0, 0, 1280, 720);
+
+      // Hero Gameplay Device Frame in Center
+      const frameW = 380;
+      const frameH = 675;
+      const frameX = (1280 - frameW) / 2;
+      const frameY = 22;
+
+      ctx.save();
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+      ctx.shadowBlur = 24;
+      ctx.fillStyle = '#000';
+      ctx.fillRect(frameX - 8, frameY - 8, frameW + 16, frameH + 16);
+      ctx.restore();
+
+      ctx.drawImage(img, frameX, frameY, frameW, frameH);
+
+      // Side Feature Callouts
+      drawSideBadge('LOCATION:', locationName, 120, 280);
+      drawSideBadge('MISSION:', 'PICK UP & DODGE', 120, 420);
+
+      drawSideBadge('MODE:', isRain ? '🌧️ MONSOON' : '☀️ ENDLESS', 960, 280);
+      drawSideBadge('FPS:', '60 SMOOTH', 960, 420);
+
+      // Main Action Header Banner
+      drawBannerText(bannerText, 660, '#FFD54F', 32);
+    }
+
+    function renderGameplaySplit(imgA, imgB, bannerText, t, dur) {
+      // Dual frame showcase
+      ctx.fillStyle = '#111A24';
+      ctx.fillRect(0, 0, 1280, 720);
+
+      const frameW = 340;
+      const frameH = 604;
+      const y = 35;
+
+      // Device A (Left)
+      if (imgA) {
+        ctx.drawImage(imgA, 220, y, frameW, frameH);
+        ctx.strokeStyle = '#FFD54F';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(220, y, frameW, frameH);
+      }
+
+      // Device B (Right)
+      if (imgB) {
+        ctx.drawImage(imgB, 720, y, frameW, frameH);
+        ctx.strokeStyle = '#2E7D32';
+        ctx.lineWidth = 4;
+        ctx.strokeRect(720, y, frameW, frameH);
+      }
+
+      // Header Banner
+      drawBannerText(bannerText, 675, '#FFE082', 32);
+    }
+
+    function renderOutro(t) {
+      if (images.cover) {
+        ctx.drawImage(images.cover, 0, 0, 1280, 720);
+      }
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+      ctx.fillRect(0, 0, 1280, 720);
+
+      if (images.logo) {
+        ctx.drawImage(images.logo, 140, 120, 1000, 312);
+      }
+
+      drawBannerText('PICK UP. DODGE. DELIVER. REPEAT.', 490, '#FFD54F', 32);
+      drawBannerText('PLAY FREE IN YOUR BROWSER NOW!', 570, '#4CAF50', 36);
+      drawBannerText('AVAILABLE ON CRAZYGAMES • POKI • YOUTUBE PLAYABLES', 640, '#FFFFFF', 20);
+    }
+
+    function drawBannerText(text, y, color, size = 30) {
+      ctx.save();
+      ctx.font = 'bold ' + size + 'px "Arial Black", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(0,0,0,0.9)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 4;
+      ctx.fillStyle = color;
+      ctx.fillText(text, 640, y);
+      ctx.restore();
+    }
+
+    function drawSideBadge(label, val, x, y) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(27, 94, 32, 0.85)';
+      ctx.strokeStyle = '#FFD54F';
+      ctx.lineWidth = 2;
+      ctx.fillRect(x, y, 200, 70);
+      ctx.strokeRect(x, y, 200, 70);
+
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillStyle = '#FFE082';
+      ctx.fillText(label, x + 15, y + 25);
+
+      ctx.font = 'bold 16px "Arial Black", sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(val, x + 15, y + 52);
+      ctx.restore();
+    }
+
+    function renderCinematicVignette() {
+      // 10px black top/bottom letterbox bars
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, 1280, 8);
+      ctx.fillRect(0, 712, 1280, 8);
+    }
+  </script>
+</body>
+</html>
+
